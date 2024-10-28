@@ -1,26 +1,26 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel
 
 app = FastAPI()
 
-class CalculationRequest(BaseModel):
-    a: float
-    b: float
+class Calculation(BaseModel):
     operation: str
+    number1: float
+    number2: float
 
-@app.post("/calc")
-def calculate(data: CalculationRequest):
-    a, b, operation = data.a, data.b, data.operation
-    if operation == "add":
-        result = a + b
-    elif operation == "subtract":
-        result = a - b
-    elif operation == "multiply":
-        result = a * b
-    elif operation == "divide":
-        if b == 0:
-            raise HTTPException(status_code=400, detail="Cannot divide by zero")
-        result = a / b
+@app.post("/calculate/")
+def calculate(calc: Calculation):
+    if calc.operation == "add":
+        result = calc.number1 + calc.number2
+    elif calc.operation == "subtract":
+        result = calc.number1 - calc.number2
+    elif calc.operation == "multiply":
+        result = calc.number1 * calc.number2
+    elif calc.operation == "divide":
+        if calc.number2 == 0:
+            return {"error": "Cannot divide by zero"}
+        result = calc.number1 / calc.number2
     else:
-        raise HTTPException(status_code=400, detail="Invalid operation")
-    return {"operation": operation, "a": a, "b": b, "result": result}
+        return {"error": "Invalid operation"}
+    
+    return {"result": result}
