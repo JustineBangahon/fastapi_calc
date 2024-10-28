@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Form
+from fastapi import FastAPI, Body
 from fastapi.responses import HTMLResponse
 
 app = FastAPI()
@@ -56,7 +56,11 @@ async def calculator_form():
     return HTMLResponse(content=html_content.format(result_display=""))
 
 @app.post("/calculate", response_class=HTMLResponse)
-async def calculate(a: float = Form(...), b: float = Form(...), operation: str = Form(...)):
+async def calculate(data: dict = Body(...)):
+    a = data.get('a')
+    b = data.get('b')
+    operation = data.get('operation')
+
     result = None
     if operation == "add":
         result = a + b
